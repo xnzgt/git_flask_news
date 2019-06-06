@@ -1,5 +1,7 @@
 # 配置类代码抽取
 # 1:集成配置类
+import logging
+
 from redis import StrictRedis
 
 
@@ -21,16 +23,18 @@ class Config(object):
     # 设置session保存时间
     PERMANENT_SESSION_LIFETIME = 86400 * 2
 
+    # 设置日志等级
+    LOG_LEVEL = logging.DEBUG
 # 将相同的配置作为基类，其余的继承基类
 # 开发环境类
 class DevelopConfig(Config):
     DEBUG = True
-
+    LOG_LEVEL = logging.DEBUG
 
 # 生产环境类
 class ProductConfig(Config):
     DEBUG = False
-
+    LOG_LEVEL = logging.ERROR
 
 # 测试环境类
 class TestingConfig(Config):
