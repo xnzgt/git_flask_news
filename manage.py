@@ -23,11 +23,7 @@ Migrate(app,db)
 manager.add_command('db',MigrateCommand)
 
 
-@app.route('/')
-def index():
-    # 测试session
-    session["name"] = "谢年智"
-    return "helloWorld"
+
 
 if __name__ == '__main__':
     app.run()
