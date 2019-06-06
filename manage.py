@@ -3,6 +3,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 # 3:集成redis
 import redis
+# 4:设置csrf验证
+from flask_wtf import CSRFProtect
 
 app = Flask(__name__)
 
@@ -18,6 +20,9 @@ app.config.from_object(Config)
 # 初始化数据库对象
 db = SQLAlchemy(app)
 redis_store = redis.StrictRedis(host=Config.REDIS_HOST,port=Config.REDIS_PORT)
+# 开启csrf
+app.config.from_object(Config)
+CSRFProtect(app)
 
 @app.route('/')
 def index():
