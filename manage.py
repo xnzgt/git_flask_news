@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, session
 # 2:配置数据库
 from flask_sqlalchemy import SQLAlchemy
 # 3:集成redis
@@ -42,8 +42,8 @@ Session(app)
 
 @app.route('/')
 def index():
-    # 测试redis
-
+    # 测试session
+    session["name"] = "谢年智"
     return "helloWorld"
 
 if __name__ == '__main__':
