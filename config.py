@@ -4,7 +4,6 @@ from redis import StrictRedis
 
 
 class Config(object):
-    DEBUG = True
     SQLALCHEMY_DATABASE_URI = "mysql://root:mysql@127.0.0.1/git_flask_news"
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     REDIS_HOST = "127.0.0.1"

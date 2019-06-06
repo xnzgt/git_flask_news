@@ -12,9 +12,10 @@ from redis import StrictRedis
 from flask_script import Manager
 from flask_migrate import Migrate,MigrateCommand
 from config import Config
-from info import app,db
+from info import create_app,db
 
 
+app = create_app("develop")
 # 初始化manager对象
 manager = Manager(app)
 # TODO:Migrate位置问题
