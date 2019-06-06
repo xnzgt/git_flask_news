@@ -12,26 +12,15 @@ from redis import StrictRedis
 from flask_script import Manager
 from flask_migrate import Migrate,MigrateCommand
 from config import Config
+from info import app,db
 
-app = Flask(__name__)
 
 # 初始化manager对象
 manager = Manager(app)
-
-manager.add_command('db',MigrateCommand)
-
-
-
-app.config.from_object(Config)
-# 初始化数据库对象
-db = SQLAlchemy(app)
 # TODO:Migrate位置问题
 Migrate(app,db)
-redis_store = redis.StrictRedis(host=Config.REDIS_HOST,port=Config.REDIS_PORT)
-# 开启csrf
-CSRFProtect(app)
-# 初始化Session
-Session(app)
+manager.add_command('db',MigrateCommand)
+
 
 @app.route('/')
 def index():
