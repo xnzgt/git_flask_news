@@ -21,3 +21,26 @@ class Config(object):
     SESSION_PERMANENT = False
     # 设置session保存时间
     PERMANENT_SESSION_LIFETIME = 86400 * 2
+
+# 将相同的配置作为基类，其余的继承基类
+# 开发环境类
+class DevelopConfig(Config):
+    DEBUG = True
+
+
+# 生产环境类
+class ProductConfig(Config):
+    DEBUG = False
+
+
+# 测试环境类
+class TestingConfig(Config):
+    DEBUG = True
+
+
+# 使用字典封装
+config = {
+    "develop":DevelopConfig,
+    "product":ProductConfig,
+    "testing":TestingConfig
+}
