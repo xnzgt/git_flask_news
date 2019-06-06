@@ -8,8 +8,18 @@ from flask_wtf import CSRFProtect
 # 5:将session保存到Session中
 from flask_session import Session
 from redis import StrictRedis
+# 集成flask设置数据库迁移扩展
+from flask_script import Manager
+from flask_migrate import Migrate,MigrateCommand
+
 
 app = Flask(__name__)
+
+# 初始化manager对象
+manager = Manager(app)
+
+manager.add_command('db',MigrateCommand)
+
 
 # 1:集成配置类
 class Config(object):
@@ -34,6 +44,8 @@ class Config(object):
 app.config.from_object(Config)
 # 初始化数据库对象
 db = SQLAlchemy(app)
+# TODO:Migrate位置问题
+Migrate(app,db)
 redis_store = redis.StrictRedis(host=Config.REDIS_HOST,port=Config.REDIS_PORT)
 # 开启csrf
 CSRFProtect(app)
@@ -47,4 +59,5 @@ def index():
     return "helloWorld"
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
+    # manager.run()
