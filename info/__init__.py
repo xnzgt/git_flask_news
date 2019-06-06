@@ -9,7 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
 from config import config
 from redis import StrictRedis
-from info.modules.index import index_blu
+
 
 # TODO 2:Error 111 connecting to 127.0.0.1:6379. Connection refused.BUG是因为redis服务未启动
 
@@ -29,7 +29,7 @@ def set_log(config_name):
     # 为全局的日志工具对象（flask app使用的）添加日志记录器
     logging.getLogger().addHandler(file_log_handler)
 
-redis_store = None
+redis_store = None # type:StrictRedis
 # 可变参数，用函数封装或放在配置文件中
 def create_app(config_name):
     set_log(config_name)
@@ -43,5 +43,7 @@ def create_app(config_name):
     CSRFProtect(app)
     # 初始化Session
     Session(app)
+    # TODO 3:只用一次的模块什么时候用什么时候导入
+    from info.modules.index import index_blu
     app.register_blueprint(index_blu)
     return app
