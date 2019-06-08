@@ -12,7 +12,7 @@ from redis import StrictRedis
 from flask_script import Manager
 from flask_migrate import Migrate,MigrateCommand
 from config import Config
-from info import create_app,db
+from info import create_app,db,models
 
 
 app = create_app("develop")
@@ -26,5 +26,6 @@ manager.add_command('db',MigrateCommand)
 
 
 if __name__ == '__main__':
-    app.run()
-    # manager.run()
+    # app.run()
+    # TODO 4:数据库迁移使用manager运行
+    manager.run()
