@@ -35,6 +35,10 @@ def send_sms_code():
     if not all([mobile, image_code, image_code_id]):
         return jsonify(errno=RET.PARAMERR, errmsg="参数错误")
 
+    # 判断手机号书写是否正确
+    if not re.match(r"1[35678]\\d{9}", mobile):
+        return jsonify(errno=RET.DATAERR, errmsg="手机号格式不正确")
+
 
 
 
