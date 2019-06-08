@@ -1,6 +1,9 @@
-from flask import request, abort, current_app, make_response
+import random
+import re
+from flask import request, abort, current_app, make_response, jsonify
 
 from info import redis_store, constants
+from info.libs.yuntongxun.sms import CCP
 from info.modules.passport import passport_blu
 
 
@@ -8,6 +11,9 @@ from info.utils.captcha.captcha import captcha
 
 
 # 发送短信后端实现
+from info.utils.response_code import RET
+
+
 @passport_blu.route("/",methods=["POST"])
 def send_sms_code():
     """
@@ -19,7 +25,12 @@ def send_sms_code():
     # 向容联云发送生成验证码
     # 如果发送成功返回给前端提示
     """
-    # 传入格式是json,需转换为字典格式
+    # 传入格式是json,需转换为字典格式,通过字典格式获取对应的值
+    params_dict = request.json()
+    # 接收三个数据 mobile,image_code,image_code_id
+    mobile = params_dict.get("mobile")
+    image_code = params_dict.get("image_code")
+    image_code_id = params_dict.get("image_code_id")
 
 
 # 定义接收前端图片验证码的视图函数
