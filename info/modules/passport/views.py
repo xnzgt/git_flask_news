@@ -39,6 +39,11 @@ def send_sms_code():
     if not re.match(r"1[35678]\\d{9}", mobile):
         return jsonify(errno=RET.DATAERR, errmsg="手机号格式不正确")
 
+    # 从redis中取出真实的图片验证码
+    real_image_id = redis_store.get("ImageCodeId:" + image_code_id)
+    # 与用户输入的图片验证码进行比较,不正确则提示
+    if image_code_id.upper() != image_code.upper():
+        return jsonify(errno=RET.DATAERR, errmsg="验证码输入错误")
 
 
 
