@@ -45,6 +45,16 @@ def send_sms_code():
     if image_code_id.upper() != image_code.upper():
         return jsonify(errno=RET.DATAERR, errmsg="验证码输入错误")
 
+    # 定义随机验证码
+    sms_code_str = "%06d" % random.randint(0, 999999)
+    # 将验证码保存到log日志中
+    current_app.logger("短信验证码为:%d" % sms_code_str)
+    # 像容联云发送数据,数据发送失败提示报错误
+    result = CCP().send_template_sms(mobile, [sms_code_str, constants.SMS_CODE_REDIS_EXPIRES], 1)
+    if result != 0:
+        return jsonify(errno=RET.DATAERR, errmsg="数据发送失败")
+    # 向前端发送信息提示短信发送成功
+    return jsonify(errno=RET.OK, errmsg="短信发送成功")
 
 
 # 定义接收前端图片验证码的视图函数
