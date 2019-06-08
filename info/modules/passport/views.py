@@ -29,6 +29,6 @@ def get_img_code():
         abort(500)
     # 5：返回验证码图片到前端
     response = make_response(image)
-    # 设置数据类型
+    # 设置响应数据类型
     response.headers['Content-Type'] = "image/jpg"
     return response
