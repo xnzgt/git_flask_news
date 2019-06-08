@@ -3,10 +3,26 @@ from flask import request, abort, current_app, make_response
 from info import redis_store, constants
 from info.modules.passport import passport_blu
 
-# 定义接收前端数据的视图函数
+
 from info.utils.captcha.captcha import captcha
 
 
+# 发送短信后端实现
+@passport_blu.route("/",methods=["POST"])
+def send_sms_code():
+    """
+    # 接收前端发送的手机号，图片验证码，uuid
+    # 校验三个值是否都存在
+    # 校验手机号,正则
+    # 检查图片验证码是否正确,与redis中保存的验证码比较正确
+    # 定义随机验证码,用于向容联云发送
+    # 向容联云发送生成验证码
+    # 如果发送成功返回给前端提示
+    """
+    # 传入格式是json,需转换为字典格式
+
+
+# 定义接收前端图片验证码的视图函数
 @passport_blu.route("/image_code")
 def get_img_code():
     """
