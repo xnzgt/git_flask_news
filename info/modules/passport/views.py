@@ -1,15 +1,73 @@
 import random
 import re
-from flask import request, abort, current_app, make_response, jsonify
+from flask import request, abort, current_app, make_response, jsonify, session
 
-from info import redis_store, constants
+from info import redis_store, constants, db
 from info.libs.yuntongxun.sms import CCP
+from info.models import User
 from info.modules.passport import passport_blu
 from info.utils.captcha.captcha import captcha
 from info.utils.response_code import RET
 
 
+# 注册后端实现
+@passport_blu.route("/register",methods=["POST"])
+def register():
+    """
+    接收三个参数 mobile smscode  password
+    全局校验
+    校验短信验证码
+    初始化密码
+    保存用户登录状态
+    向前端返回响应
+    :return:
+    """
+    param_dict = request.json
+    mobile = param_dict.get("mobile")
+    smscode = param_dict.get("smscode")
+    password = param_dict.get("password")
 
+    if not all ([mobile,smscode,password]):
+        return jsonify(errno=RET.PARAMERR,errmsg="参数不完整")
+
+    if not re.match(r"1[35678]\d{9}", mobile):
+        return jsonify(errno=RET.DATAERR, errmsg="手机号格式不正确")
+
+    try:
+        real_sms_code = redis_store.get("SMS_" + mobile)
+    except Exception as e:
+        current_app.logger.debug(e)
+        return jsonify(errno=RET.DBERR,errmsg="redis查询失败")
+
+    # 如果没有真实验证码,提示短信验证码已经过期
+    if not real_sms_code:
+        return jsonify(errno=RET.DATAERR,errmsg="短信验证码已经过期")
+
+
+    # 将用户输入短信验证码和redis查询验证码比较
+    if not real_sms_code == smscode:
+        return jsonify(errno=RET.DATAERR,errmsg="短信验证码输入错误")
+
+    # 初始化用户对象,将数据保存到数据库
+    user = User()
+    user.mobile = mobile
+    user.nick_name = mobile
+    user.password = password
+    try:
+        db.session.add(user)
+        db.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(e)
+
+        return jsonify(errno=RET.DBERR,errmsg="数据保存错误")
+
+    # 保存用户状态
+    session["user_id"] = user.id
+    session["nick_name"] = user.nick_name
+    session["mobile"] = user.mobile
+
+    return jsonify(errno=RET.OK, errmsg="短信发送成功")
 
 
 # 发送短信后端实现
