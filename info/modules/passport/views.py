@@ -26,30 +26,35 @@ def send_sms_code():
     # 如果发送成功返回给前端提示
     """
     # 传入格式是json,需转换为字典格式
-    return jsonify(errno=RET.OK, errmsg="短信发送成功")
-    params_dict = request.json()
+    # return jsonify(errno=RET.OK, errmsg="短信发送成功")
+    params_dict = request.json
     # 接收三个数据 mobile,image_code,image_code_id
     mobile = params_dict.get("mobile")
+    print(mobile)
     image_code = params_dict.get("image_code")
+    print(image_code)
     image_code_id = params_dict.get("image_code_id")
+    print(image_code_id)
     # 判断三个值是否都存在
     if not all([mobile, image_code, image_code_id]):
         return jsonify(errno=RET.PARAMERR, errmsg="参数错误")
 
     # 判断手机号书写是否正确
-    if not re.match(r"1[35678]\\d{9}", mobile):
+    if not re.match(r"1[35678]\d{9}", mobile):
         return jsonify(errno=RET.DATAERR, errmsg="手机号格式不正确")
 
     # 从redis中取出真实的图片验证码
     real_image_id = redis_store.get("ImageCodeId:" + image_code_id)
+    print(real_image_id)
     # 与用户输入的图片验证码进行比较,不正确则提示
-    if image_code_id.upper() != image_code.upper():
+    if real_image_id.upper() != image_code.upper():
         return jsonify(errno=RET.DATAERR, errmsg="验证码输入错误")
 
     # 定义随机验证码
     sms_code_str = "%06d" % random.randint(0, 999999)
     # 将验证码保存到log日志中
-    current_app.logger("短信验证码为:%d" % sms_code_str)
+    current_app.logger.debug("短信验证码为:%s" % sms_code_str)
+
     # # 像容联云发送数据,数据发送失败提示报错误
     # result = CCP().send_template_sms(mobile, [sms_code_str, constants.SMS_CODE_REDIS_EXPIRES], 1)
     # if result != 0:

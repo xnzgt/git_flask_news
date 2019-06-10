@@ -153,9 +153,9 @@ var imageCodeId = ""
 // TODO 生成一个图片验证码的编号，并设置页面中图片验证码img标签的src属性
 function generateImageCode() {
     // 生成uuid
-    imageCode = generateUUID()
+    imageCodeId = generateUUID()
     // 拼接url用于图片的验证码设置
-    var url = "/passport/image_code?imageCodeId=" +imageCode
+    var url = "/passport/image_code?imageCodeId=" + imageCodeId
     // 通过类选择器将url添加入img属性
     $(".get_pic_code").attr("src",url)
 }
@@ -182,14 +182,14 @@ function sendSMSCode() {
     // TODO 发送短信验证码
     var params = {
         "mobile":mobile,
-        "imageCode":imageCode,
-        "imageCodeId":imageCodeId
-    }
+        "image_code":imageCode,
+        "image_code_id":imageCodeId
+    };
     $.ajax({
         // 请求地址
         url:"/passport/sms_code",
         // 请求方式
-        method:"post",
+        method:"POST",
         // 请求数据
         data:JSON.stringify(params),
         // 请求数据类型,不写后端接收不到数据
