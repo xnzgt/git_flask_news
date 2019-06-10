@@ -1,13 +1,24 @@
 from flask import render_template, current_app, session, jsonify
 
 from info import redis_store, constants
-from info.models import User, News
+from info.models import User, News, Category
 from info.modules.index import index_blu
 from info.utils.response_code import RET
 
 
 @index_blu.route('/')
 def index():
+    # 新闻分类设置
+    """
+    从数据库中查出分类名
+    添加进data字典中
+    :return:
+    """
+    news_cly = Category.query.all()
+    news_cly_list = [cly_name.to_dict() for cly_name in news_cly]
+    print(news_cly_list)
+
+
     # 排行榜设计
     """
     从数据库中查出排行前六的列表
@@ -41,10 +52,11 @@ def index():
     # 将列表中的数据库对象转换为字典
     user = user.to_dict() if user else None
 
-
+    # 定义字典向前端模板发送
     data = {
         "user_info":user,
-        "news_hot":news_hot
+        "news_hot":news_hot,
+        "news_cly_list":news_cly_list
     }
 
     return render_template("news/index.html",data = data)
