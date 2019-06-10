@@ -22,10 +22,10 @@ def index():
             current_app.logger.error(e)
             return jsonify(errno=RET.DBERR,errmsg="数据库查询错误")
 
-    user_info = [user.to_dict() if user else None ]
-
+    user = user.to_dict() if user else None
+    print(user)
     data = {
-        "user_info":user_info
+        "user_info":user
     }
 
     return render_template("news/index.html",data = data)
