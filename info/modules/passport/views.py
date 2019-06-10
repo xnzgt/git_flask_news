@@ -23,6 +23,7 @@ def send_sms_code():
     # 检查图片验证码是否正确,与redis中保存的验证码比较正确
     # 定义随机验证码,用于向容联云发送
     # 向容联云发送生成验证码
+    # 将验证码保存到redis中
     # 如果发送成功返回给前端提示
     """
     # 传入格式是json,需转换为字典格式
@@ -49,10 +50,19 @@ def send_sms_code():
     sms_code_str = "%06d" % random.randint(0, 999999)
     # 将验证码保存到log日志中
     current_app.logger("短信验证码为:%d" % sms_code_str)
-    # 像容联云发送数据,数据发送失败提示报错误
-    result = CCP().send_template_sms(mobile, [sms_code_str, constants.SMS_CODE_REDIS_EXPIRES], 1)
-    if result != 0:
-        return jsonify(errno=RET.DATAERR, errmsg="数据发送失败")
+    # # 像容联云发送数据,数据发送失败提示报错误
+    # result = CCP().send_template_sms(mobile, [sms_code_str, constants.SMS_CODE_REDIS_EXPIRES], 1)
+    # if result != 0:
+    #     return jsonify(errno=RET.DATAERR, errmsg="数据发送失败")
+
+    # 将验证码保存到redis
+    try:
+        redis_store.setex("SMS_" + mobile, constants.SMS_CODE_REDIS_EXPIRES,sms_code_str)
+    except Exception as e:
+        current_app.logger(e)
+        return jsonify(errno=RET.DBERR,errmsg="短信验证码保存错误")
+
+
     # 向前端发送信息提示短信发送成功
     return jsonify(errno=RET.OK, errmsg="短信发送成功")
 
