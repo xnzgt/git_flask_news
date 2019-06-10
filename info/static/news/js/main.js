@@ -154,6 +154,9 @@ $(function(){
             url:"/passport/register",
             method:"POST",
             data:JSON.stringify(params),
+            headers: {
+            "X-CSRFToken": getCookie("csrf_token")
+            },
             contentType:"application/json",
             success:function (resp) {
                 if (resp.errno == "0"){
@@ -212,6 +215,10 @@ function sendSMSCode() {
         url:"/passport/sms_code",
         // 请求方式
         method:"POST",
+        // 获取csrf_token
+        headers: {
+            "X-CSRFToken": getCookie("csrf_token")
+            },
         // 请求数据
         data:JSON.stringify(params),
         // 请求数据类型,不写后端接收不到数据

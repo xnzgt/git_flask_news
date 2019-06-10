@@ -1,12 +1,34 @@
-from flask import render_template, current_app
+from flask import render_template, current_app, session, jsonify
 
 from info import redis_store
+from info.models import User
 from info.modules.index import index_blu
+from info.utils.response_code import RET
 
 
 @index_blu.route('/')
 def index():
-    return render_template("news/index.html")
+    # 设置首页右上角用户名显示
+    """
+    使用session中的user_id来判断用户是否登录
+    :return:
+    """
+    user_id = session.get("user_id")
+    user = None
+    if user_id:
+        try:
+            user = User().query.get(user_id)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(errno=RET.DBERR,errmsg="数据库查询错误")
+
+    user_info = [user.to_dict() if user else None ]
+
+    data = {
+        "user_info":user_info
+    }
+
+    return render_template("news/index.html",data = data)
 
 @index_blu.route('/favicon.ico')
 def favicon():
