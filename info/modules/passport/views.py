@@ -26,7 +26,7 @@ def register():
     mobile = param_dict.get("mobile")
     smscode = param_dict.get("smscode")
     password = param_dict.get("password")
-
+    print(mobile,smscode,password)
     if not all ([mobile,smscode,password]):
         return jsonify(errno=RET.PARAMERR,errmsg="参数不完整")
 
@@ -55,11 +55,10 @@ def register():
     user.password = password
     try:
         db.session.add(user)
-        db.commit()
+        db.session.commit()
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(e)
-
         return jsonify(errno=RET.DBERR,errmsg="数据保存错误")
 
     # 保存用户状态

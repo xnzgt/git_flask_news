@@ -147,7 +147,7 @@ $(function(){
         var params = {
             "mobile":mobile,
             "smscode":smscode,
-            "passport":password
+            "password":password
         };
 
         $.ajax({
