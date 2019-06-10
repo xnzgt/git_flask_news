@@ -22,6 +22,7 @@ def register():
     向前端返回响应
     :return:
     """
+    return jsonify(errno=RET.OK, errmsg="短信发送成功")
     param_dict = request.json
     mobile = param_dict.get("mobile")
     smscode = param_dict.get("smscode")
