@@ -1,7 +1,8 @@
 import random
 import re
-from flask import request, abort, current_app, make_response, jsonify, session
+from datetime import datetime
 
+from flask import request, abort, current_app, make_response, jsonify, session
 from info import redis_store, constants, db
 from info.libs.yuntongxun.sms import CCP
 from info.models import User
@@ -9,6 +10,9 @@ from info.modules.passport import passport_blu
 from info.utils.captcha.captcha import captcha
 from info.utils.response_code import RET
 
+
+
+# 退出登录功能
 @passport_blu.route("/logout",methods=["POST"])
 def logout():
     # 退出登录即清除session
@@ -16,6 +20,54 @@ def logout():
     session.pop("nick_name")
     session.pop("mobile")
     return jsonify(errno=RET.OK, errmsg="session清除完毕")
+
+# 登录功能
+@passport_blu.route("/login", methods = ["POST"])
+def login():
+    """
+    接收两个参数 mobile password
+    从数据库查询手机号不存在则提示用户未注册
+    校验密码
+    保存用户状态
+    记录最后一次登录时间
+    :return:
+    """
+    param_dict = request.json
+    mobile = param_dict.get("mobile")
+    password = param_dict.get("password")
+    # 全局校验
+    if not all ([mobile,password]):
+        return jsonify(errno=RET.PARAMERR,errmsg="参数不完整")
+
+    # 从数据库中查询用户是存在
+    try:
+        user = User.query.filter_by(mobile= mobile).first()
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR,errmsg="数据库查询错误")
+
+    if not user:
+        return jsonify(errno=RET.DATAERR,errmsg="用户未注册")
+
+    # 校验密码
+    if not user.check_passowrd(password):
+        return jsonify(errno=RET.DATAERR,errmsg="密码输入错误")
+
+    # 保存用户登录状态
+    session["user_id"] = user.id
+    session["mobile"] = user.mobile
+    session["nick_name"] = user.nick_name
+
+    # 设置用户最后一次登录时间
+    user.last_login = datetime.now()
+
+    try:
+        db.session.commit()
+    except Exception as e:
+        current_app.logger.error(e)
+
+    # 校验完毕向前端发送提示
+    return jsonify(errno=RET.OK, errmsg="允许登录")
 
 
 # 注册后端实现
