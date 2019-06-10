@@ -119,6 +119,30 @@ $(function(){
         }
 
         // 发起登录请求
+        var params = {
+            "mobile":mobile,
+            "password":password
+        }
+        $.ajax({
+            url:"/passport/login",
+            method:"POST",
+            data:JSON.stringify(params),
+            headers: {
+            "X-CSRFToken": getCookie("csrf_token")
+            },
+            contentType:"application/json",
+            success:function (resp) {
+                if(resp.errno == "0"){
+                    // 校验成功 刷新当前界面
+                    location.reload()
+                }else{
+                    // 校验失败提示错误信息
+                    $("#login-password-err").html(resp.errmsg);
+                    $("#login-password-err").show();
+                }
+
+            }
+        })
     })
 
 
