@@ -22,8 +22,8 @@ def index():
             current_app.logger.error(e)
             return jsonify(errno=RET.DBERR,errmsg="数据库查询错误")
 
+    # 将列表中的数据库对象转换为字典
     user = user.to_dict() if user else None
-    print(user)
     data = {
         "user_info":user
     }

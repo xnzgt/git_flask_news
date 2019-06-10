@@ -301,3 +301,19 @@ function generateUUID() {
     });
     return uuid;
 }
+
+function logout() {
+    $.ajax({
+        url:"/passport/logout",
+        method:"POST",
+        contentType:"application/json",
+        headers:{
+            "X-CSRFToken":getCookie("csrf_token")
+        },
+        success:function (resp) {
+            location.reload()
+
+        }
+    })
+
+}

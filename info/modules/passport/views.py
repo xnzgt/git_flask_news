@@ -9,6 +9,14 @@ from info.modules.passport import passport_blu
 from info.utils.captcha.captcha import captcha
 from info.utils.response_code import RET
 
+@passport_blu.route("/logout",methods=["POST"])
+def logout():
+    # 退出登录即清除session
+    session.pop("user_id")
+    session.pop("nick_name")
+    session.pop("mobile")
+    return jsonify(errno=RET.OK, errmsg="session清除完毕")
+
 
 # 注册后端实现
 @passport_blu.route("/register",methods=["POST"])
