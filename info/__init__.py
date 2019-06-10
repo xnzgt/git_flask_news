@@ -7,6 +7,8 @@ from flask import Flask
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
+from flask_wtf.csrf import generate_csrf
+
 from config import config
 from redis import StrictRedis
 
@@ -34,13 +36,21 @@ redis_store = None # type:StrictRedis
 def create_app(config_name):
     set_log(config_name)
     app = Flask(__name__)
+    app.secret_key = "sadfasdf"
     app.config.from_object(config[config_name])
     # 初始化数据库对象
     db.init_app(app)
     global redis_store
     redis_store = redis.StrictRedis(host=config[config_name].REDIS_HOST,port=config[config_name].REDIS_PORT,decode_responses=True)
     # 开启csrf
-    # CSRFProtect(app)
+    CSRFProtect(app)
+    # 在响应后设置csrftoken
+    @app.after_request
+    def after_request(resp):
+        csrf_token = generate_csrf()
+        resp.set_cookie("csrf_token",csrf_token)
+        return resp
+
     # 初始化Session
     Session(app)
     # TODO 3:只用一次的模块什么时候用什么时候导入
