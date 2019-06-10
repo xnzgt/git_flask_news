@@ -5,16 +5,15 @@ from flask import request, abort, current_app, make_response, jsonify
 from info import redis_store, constants
 from info.libs.yuntongxun.sms import CCP
 from info.modules.passport import passport_blu
-
-
 from info.utils.captcha.captcha import captcha
-
-
-# 发送短信后端实现
 from info.utils.response_code import RET
 
 
-@passport_blu.route("/",methods=["POST"])
+
+
+
+# 发送短信后端实现
+@passport_blu.route("/sms_code",methods=["POST"])
 def send_sms_code():
     """
     # 接收前端发送的手机号，图片验证码，uuid
@@ -27,6 +26,7 @@ def send_sms_code():
     # 如果发送成功返回给前端提示
     """
     # 传入格式是json,需转换为字典格式
+    return jsonify(errno=RET.OK, errmsg="短信发送成功")
     params_dict = request.json()
     # 接收三个数据 mobile,image_code,image_code_id
     mobile = params_dict.get("mobile")
@@ -81,6 +81,7 @@ def get_img_code():
         return abort(403)
     # 3：从工具包中生成图片验证码,返回值是元组
     name,text,image = captcha.generate_captcha()
+    print(text)
 
     # 4：将图片验证码保存到redis中
     try:

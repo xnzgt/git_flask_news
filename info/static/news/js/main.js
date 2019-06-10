@@ -180,6 +180,53 @@ function sendSMSCode() {
     }
 
     // TODO 发送短信验证码
+    var params = {
+        "mobile":mobile,
+        "imageCode":imageCode,
+        "imageCodeId":imageCodeId
+    }
+    $.ajax({
+        // 请求地址
+        url:"/passport/sms_code",
+        // 请求方式
+        method:"post",
+        // 请求数据
+        data:JSON.stringify(params),
+        // 请求数据类型,不写后端接收不到数据
+        contentType:"application/json",
+        // 响应数据格式
+        dataType:"json",
+        // 发送成功执行回调函数
+        success:function (resp) {
+            if (resp.errno == "0"){
+                // 成功后倒计时
+                var num = 60;
+                var t = setInterval(function () {
+                    if (num == 1){
+                        clearInterval(t);
+                        $(".get_code").html("获取验证码");
+                        $(".get_code").attr("onclick","sendSMSCode();");
+                    }else{
+                        num -= 1;
+                        $(".get_code").html(num + "秒")
+                    }
+
+                },1000)
+            }else{
+                // 失败的话将错误信息展示
+                                // 表示后端出现了错误，可以将错误信息展示到前端页面中
+                $("#register-sms-code-err").html(resp.errmsg);
+                $("#register-sms-code-err").show();
+                // 将点击按钮的onclick事件函数恢复回去
+                $(".get_code").attr("onclick", "sendSMSCode();");
+                // 如果错误码是4004，代表验证码错误，重新生成验证码
+                if (resp.errno == "4004") {
+                    generateImageCode()
+                }
+
+            }
+        }
+    })
 }
 
 // 调用该函数模拟点击左侧按钮

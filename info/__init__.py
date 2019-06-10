@@ -40,7 +40,7 @@ def create_app(config_name):
     global redis_store
     redis_store = redis.StrictRedis(host=config[config_name].REDIS_HOST,port=config[config_name].REDIS_PORT)
     # 开启csrf
-    CSRFProtect(app)
+    # CSRFProtect(app)
     # 初始化Session
     Session(app)
     # TODO 3:只用一次的模块什么时候用什么时候导入
