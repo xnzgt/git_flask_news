@@ -54,11 +54,7 @@ $(function () {
                     cur_page += 1
                     updateNewsData()
                 }
-            }else{
-                data_querying = false
-
             }
-
         }
     })
 })
@@ -70,7 +66,7 @@ function updateNewsData() {
         "page": cur_page
     }
     $.get("/news_list", params, function (response) {
-        if (response.errno == "0"){
+        if (response.errno == "0") {
             // 在第一次加载的时候，就应该修改他的总页数
             total_page = response.data.total_page
             // alert(total_page)
@@ -79,15 +75,15 @@ function updateNewsData() {
             // 显示数据
             // 清空所有的新闻
             // 只有当当前页为第一页的时候才去清除所有的数据，第二页不能清除所有
-            if (cur_page == 1){
-                 $(".list_con").html("")
+            if (cur_page == 1) {
+                $(".list_con").html("")
             }
-            for (var i=0;i<response.data.new_li.length;i++) {
-                var news = response.data.new_li[i]
+            for (var i = 0; i < response.data.news_dict_li.length; i++) {
+                var news = response.data.news_dict_li[i]
                 var content = '<li>'
-                content += '<a href="/news/'+ news.id +'" class="news_pic fl"><img src="' + news.index_image_url + '?imageView2/1/w/170/h/170"></a>'
-                content += '<a href="/news/'+ news.id +'" class="news_title fl">' + news.title + '</a>'
-                content += '<a href="/news/'+ news.id +'" class="news_detail fl">' + news.digest + '</a>'
+                content += '<a href="/news/' + news.id + '" class="news_pic fl"><img src="' + news.index_image_url + '?imageView2/1/w/170/h/170"></a>'
+                content += '<a href="/news/' + news.id + '" class="news_title fl">' + news.title + '</a>'
+                content += '<a href="/news/' + news.id + '" class="news_detail fl">' + news.digest + '</a>'
                 content += '<div class="author_info fl">'
                 content += '<div class="source fl">来源：' + news.source + '</div>'
                 content += '<div class="time fl">' + news.create_time + '</div>'
@@ -96,8 +92,9 @@ function updateNewsData() {
                 $(".list_con").append(content)
             }
 
-        }else{
+        } else {
             alter(response.errmsg)
         }
     })
+
 }

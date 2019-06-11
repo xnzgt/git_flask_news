@@ -16,9 +16,9 @@ def get_news_list():
     :return:
     """
     args_dict = request.args
-    page = args_dict.get("p","1")
+    page = args_dict.get("page","1")
     per_page = args_dict.get("per_page", constants.HOME_PAGE_MAX_NEWS)
-    category_id = args_dict.get("cid","1")
+    category_id = args_dict.get("cid")
     # 校验参数
     try:
         page = int(page)
@@ -32,7 +32,7 @@ def get_news_list():
     if category_id != "1":
         filters.append(News.category_id == category_id)
     try:
-        paginate = News.query.filter(*filters).order_by(News.create_time.desc()).paginate(page,per_page,False)
+        paginate = News.query.filter(*filters).order_by(News.create_time.desc()).paginate(page, per_page, False)
         # 获取查询出来的数据
         items = paginate.items
         # 获取总页数
@@ -43,16 +43,14 @@ def get_news_list():
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR,errmsg="数据查询失败")
 
-    new_li = [news.to_basic_dict() for news in items]
-    print(new_li)
+    news_dict_li = [news.to_basic_dict() for news in items]
+    print(news_dict_li)
 
     data = {
-        "new_li": new_li,
+        "news_dict_li": news_dict_li,
         "current_page": current_page,
         "total_page": total_page
     }
-
-
 
     # 将查询的数据返回到前端
     return jsonify(errno=RET.OK,errmsg="OK",data = data)
