@@ -44,9 +44,18 @@ def get_news_list():
         return jsonify(errno=RET.DBERR,errmsg="数据查询失败")
 
     new_li = [news.to_basic_dict() for news in items]
+    print(new_li)
+
+    data = {
+        "new_li": new_li,
+        "current_page": current_page,
+        "total_page": total_page
+    }
+
+
 
     # 将查询的数据返回到前端
-    return jsonify(errno=RET.OK,errmsg="OK",total_page = total_page,current_page = current_page,new_li = new_li,cid = category_id)
+    return jsonify(errno=RET.OK,errmsg="OK",data = data)
 
 
 
