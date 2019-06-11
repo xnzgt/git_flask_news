@@ -1,9 +1,53 @@
-from flask import render_template, current_app, session, jsonify
+from flask import render_template, current_app, session, jsonify, request
 
 from info import redis_store, constants
 from info.models import User, News, Category
 from info.modules.index import index_blu
 from info.utils.response_code import RET
+
+# 新闻详情展示
+@index_blu.route('/news_list')
+def get_news_list():
+    """
+    接收参数
+    校验参数
+    按照分类不同获取新闻信息
+    将查询的新闻通过jsonify传递给前端
+    :return:
+    """
+    args_dict = request.args
+    page = args_dict.get("p","1")
+    per_page = args_dict.get("per_page", constants.HOME_PAGE_MAX_NEWS)
+    category_id = args_dict.get("cid","1")
+    # 校验参数
+    try:
+        page = int(page)
+        per_page = int(per_page)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.PARAMERR,errmsg="参数错误")
+
+    # 查询数据并分页
+    filters = []
+    if category_id != "1":
+        filters.append(News.category_id == category_id)
+    try:
+        paginate = News.query.filter(*filters).order_by(News.create_time.desc()).paginate(page,per_page,False)
+        # 获取查询出来的数据
+        items = paginate.items
+        # 获取总页数
+        total_page = paginate.pages
+        # 分页数
+        current_page = paginate.page
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR,errmsg="数据查询失败")
+
+    new_li = [news.to_basic_dict() for news in items]
+
+    # 将查询的数据返回到前端
+    return jsonify(errno=RET.OK,errmsg="OK",total_page = total_page,current_page = current_page,new_li = new_li,cid = category_id)
+
 
 
 @index_blu.route('/')

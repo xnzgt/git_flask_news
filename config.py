@@ -18,10 +18,11 @@ class Config(object):
     SESSION_REDIS = StrictRedis(host=REDIS_HOST,port=REDIS_PORT)
     # 设置session签名
     SESSION_USR_SIGNER = True
-    # 设置session不永久保存
+    # 设置cookie的存活时间为浏览器结束,如果为true则跟session保存时间一致
     SESSION_PERMANENT = False
     # 设置session保存时间
     PERMANENT_SESSION_LIFETIME = 86400 * 2
+
 
     # 设置日志等级
     LOG_LEVEL = logging.DEBUG

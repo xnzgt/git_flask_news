@@ -39,7 +39,7 @@ def login():
     if not all ([mobile,password]):
         return jsonify(errno=RET.PARAMERR,errmsg="参数不完整")
 
-    # 从数据库中查询用户是存在
+    # 从数据库中查询用户是否存在
     try:
         user = User.query.filter_by(mobile= mobile).first()
     except Exception as e:
@@ -76,6 +76,7 @@ def register():
     """
     接收三个参数 mobile smscode  password
     全局校验
+    从数据库中查询手机号,如果已经存在提示用户已经注册
     校验短信验证码
     初始化密码
     保存用户登录状态
@@ -92,6 +93,14 @@ def register():
 
     if not re.match(r"1[35678]\d{9}", mobile):
         return jsonify(errno=RET.DATAERR, errmsg="手机号格式不正确")
+
+    # 从数据库查询手机号,如果存在提示注册失败
+    try:
+        user = User.query.filter_by(mobile= mobile).first()
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR,errmsg="数据库查询错误")
+
 
     try:
         real_sms_code = redis_store.get("SMS_" + mobile)
