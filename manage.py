@@ -27,5 +27,6 @@ manager.add_command('db',MigrateCommand)
 
 if __name__ == '__main__':
     # app.run()
+    # print(app.url_map)
     # TODO 4:数据库迁移使用manager运行
     manager.run()

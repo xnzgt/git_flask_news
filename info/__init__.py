@@ -14,6 +14,7 @@ from redis import StrictRedis
 
 
 # TODO 2:Error 111 connecting to 127.0.0.1:6379. Connection refused.BUG是因为redis服务未启动
+
 from info.utils.common import news_hot_filter
 
 db = SQLAlchemy()
@@ -59,6 +60,9 @@ def create_app(config_name):
     # 注册图片验证码蓝图
     from info.modules.passport import passport_blu
     app.register_blueprint(passport_blu)
+    # 注册新闻详情页蓝图
+    from info.modules.news import news_blu
+    app.register_blueprint(news_blu)
     # 注册过滤器
     app.add_template_filter(news_hot_filter,"hot_filter")
     return app
